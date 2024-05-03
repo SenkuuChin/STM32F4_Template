@@ -1,0 +1,23 @@
+将axf转为bin文件方式：
+
+以文本方式打开 getBIN.bat ，修改里面的 KEIL_BIN_DIR 路径，该路径是Keil ARM 的bin文件夹路径，
+	没有特别修改是 Keil_v5/ARM/ARMCC/bin 或者是 Keil_v5/ARM/ARMCLANG/bin ，具体要看Keil安装在哪个路径
+	之后便会生成 bin 文件在 build/Objects 文件夹中
+
+可以在项目中的 Options of Target 的User中的 After Build/Rebuild 勾选是否运行，将会自动运行生成bin文件
+ 
+注：如果项目中修改了 Name of Excusable 文件名，则需要对应修改 AXF_FILE_NAME 和 BIN_FILE_NAME 的值
+
+/*******************************************分割线***************************************************/
+
+为避免编译器出现一些无关紧要的警告，需要在工程选项中的Misc Control配置一些如下选项：
+
+AC6以下使用下面的选项填入到Misc Control
+
+--diag_suppress=177 --diag_suppress=188 --diag_suppress=550 --diag_suppress=111
+
+/*******************************************分割线***************************************************/
+
+AC6以上则使用下面的：
+
+-Wno-invalid-source-encoding -Wno-deprecated-non-prototype

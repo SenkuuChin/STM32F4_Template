@@ -1,0 +1,19 @@
+#ifndef __MY_TIMER_GPIO_CONF_H__
+	#define __MY_TIMER_GPIO_CONF_H__
+	
+	#define TIMER3_CH1_PIN					GPIO_PIN_6
+	#define TIMER3_CH1_PIN_PORT				GPIOC
+	#define TIMER3_CH1_PIN_CLK_ENBALE()		do { __HAL_RCC_GPIOC_CLK_ENABLE(); } while (0)
+	#define TIMER3_CH2_PIN					GPIO_PIN_7
+	#define TIMER3_CH2_PIN_PORT				GPIOC
+	#define TIMER3_CH2_PIN_CLK_ENBALE()		do { __HAL_RCC_GPIOC_CLK_ENABLE(); } while (0)
+	#define TIMER3_AF						GPIO_AF2_TIM3
+	
+	#define TIMER8_CH1_PIN					GPIO_PIN_5
+	#define TIMER8_CH1_PIN_PORT				GPIOI
+	#define TIMER8_CH1_PIN_CLK_ENBALE()		do { __HAL_RCC_GPIOI_CLK_ENABLE(); } while (0)
+	#define TIMER8_CH2_PIN					GPIO_PIN_6
+	#define TIMER8_CH2_PIN_PORT				GPIOI
+	#define TIMER8_CH2_PIN_CLK_ENBALE()		do { __HAL_RCC_GPIOI_CLK_ENABLE(); } while (0)
+	#define TIMER8_AF						GPIO_AF3_TIM8
+#endif
