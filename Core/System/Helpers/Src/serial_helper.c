@@ -70,6 +70,8 @@ void Serial_Init(void)
     UART_Init();
 }
 
+extern __IO Bool UART_TransmitSuccessFlag;
+
 __IO uint8_t serialLock = NULL;
 void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     uint8_t isSpecifyLength, uint16_t dataLength,
@@ -82,13 +84,14 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     /* 进入临界段 */
     rt_enter_critical();
     #endif
-/* 定义一个发送缓冲区，存放格式化后的数据 */
+    /* 定义一个发送缓冲区，存放格式化后的数据 */
     char *buffer = NULL, *str = NULL;
     #if SYS_SRAM_MANAGE_ENABLE
     buffer = SRAMHelper.Malloc(SRAM_INTERNAL, PRINT_TEMP_DATA_LENGTH);
     #else
     buffer = (char*)malloc(sizeof(char) * PRINT_TEMP_DATA_LENGTH);
     #endif
+    RESET_ARRAY(buffer, PRINT_TEMP_DATA_LENGTH);
     uint16_t length = 0;
     va_list args;
     if (isSpecifyLength == FALSE)
@@ -142,7 +145,16 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     {
         case Serial1:
             #if SERIAL_COM1_ENABLE
-            SERIAL_SEND(USART1, length, str);
+            // 由于DMA传输需要检查是否完成上一次传输才发送下一次，与传统的发送没有区别，所以发送上还是使用传统的
+                #if SERIAL_COM1_DMA_ENABLE && 0
+                HAL_UART_Transmit_DMA(&SerialNo1.handle, (uint8_t *)str, length);
+                // 等待TX的DMA的传输完成。F407IGT6 中USART1的DMA是Stream7，所以使用 DMA_FLAG_TCIF3_7
+                while (__HAL_DMA_GET_FLAG(&SerialNo1.DMA_Tx_Handle, DMA_FLAG_TCIF3_7) == RESET);
+                // while (!UART_TransmitSuccessFlag);
+                #else
+                // HAL_UART_Transmit_IT(&SerialNo1.handle, (uint8_t *)str, length);
+                SERIAL_SEND(USART1, length, str);
+                #endif
             #endif
             break;
         case Serial2:
@@ -173,6 +185,7 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
         default:
             break;
     }
+    
     // 不指定长度，并且是有格式化的(不是纯打印的)
     if (isSpecifyLength == FALSE && isOnlyPrint == FALSE)
     {
@@ -193,6 +206,7 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     rt_exit_critical();
     #endif
 }
+
 
 void SerialDataGet(SerialType serialType, char* refData, uint16_t *refLength,
                     Bool isGetLength, Bool isGetString, Bool isPrintUse)

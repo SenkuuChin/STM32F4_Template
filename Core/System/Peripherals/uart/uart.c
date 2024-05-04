@@ -8,6 +8,7 @@ SerialTypeDef SerialNo1 = { 0 };
 #if !SYS_SRAM_MANAGE_ENABLE
 char SerialNo1Data[SERIAL_DATA_LENGTH] = { 0 };
 #endif
+
 #endif
 #if SERIAL_COM2_ENABLE
 SerialTypeDef SerialNo2 = { 0 };
@@ -44,7 +45,7 @@ char SerialNo6Data[SERIAL_DATA_LENGTH] = { 0 };
 #endif
 
 
-void UART_Init(void)
+__weak void UART_Init(void)
 {
     #if SERIAL_COM1_ENABLE
         SerialNo1.handle.Instance = USART1;
@@ -60,7 +61,46 @@ void UART_Init(void)
         #else
         SerialNo1.data = SerialNo1Data;
         #endif
+        #if SERIAL_COM1_DMA_ENABLE
+        
+        // 由于DMA传输需要检查是否完成上一次传输才发送下一次，与传统的发送没有区别，所以发送上还是使用传统的
+        SerialNo1.DMA_Tx_Handle.Instance = SERIAL_COM1_DMA_TX_INSTANCE;
+        SerialNo1.DMA_Tx_Handle.Init.Channel = SERIAL_COM1_DMA_TX_CHANNEL;
+        SerialNo1.DMA_Tx_Handle.Init.Direction = DMA_MEMORY_TO_PERIPH;
+        SerialNo1.DMA_Tx_Handle.Init.PeriphInc = DMA_PINC_DISABLE;
+        SerialNo1.DMA_Tx_Handle.Init.MemInc = DMA_MINC_ENABLE;
+        SerialNo1.DMA_Tx_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        SerialNo1.DMA_Tx_Handle.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+        SerialNo1.DMA_Tx_Handle.Init.Mode = DMA_NORMAL;
+        SerialNo1.DMA_Tx_Handle.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+        SerialNo1.DMA_Tx_Handle.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+        HAL_DMA_Init(&SerialNo1.DMA_Tx_Handle);
+        __HAL_LINKDMA(&SerialNo1.handle, hdmatx, SerialNo1.DMA_Tx_Handle);
+        
+        SerialNo1.DMA_Rx_Handle.Instance = SERIAL_COM1_DMA_RX_INSTANCE;
+        SerialNo1.DMA_Rx_Handle.Init.Channel = SERIAL_COM1_DMA_RX_CHANNEL;
+        SerialNo1.DMA_Rx_Handle.Init.Direction = DMA_PERIPH_TO_MEMORY;
+        SerialNo1.DMA_Rx_Handle.Init.PeriphInc = DMA_PINC_DISABLE;
+        SerialNo1.DMA_Rx_Handle.Init.MemInc = DMA_MINC_ENABLE;
+        SerialNo1.DMA_Rx_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        SerialNo1.DMA_Rx_Handle.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+        SerialNo1.DMA_Rx_Handle.Init.Mode = DMA_NORMAL;
+        SerialNo1.DMA_Rx_Handle.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+        SerialNo1.DMA_Rx_Handle.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+        HAL_DMA_Init(&SerialNo1.DMA_Rx_Handle);
+        __HAL_LINKDMA(&SerialNo1.handle, hdmarx, SerialNo1.DMA_Rx_Handle);
+        
+        // 空闲中断，接收引脚需要配置为上拉
+        // __HAL_UART_ENABLE_IT(&SerialNo1.handle, UART_IT_IDLE);
+        // HAL_UART_Receive_DMA(&SerialNo1.handle, (uint8_t *)SerialNo1.data, SERIAL_DATA_LENGTH);
+        // 最后的参数是一次性能接收的最大长度
+        HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo1.handle, (uint8_t *)SerialNo1.data, SERIAL_DATA_LENGTH);
+        // 关闭串口传输过半中断
+        // __HAL_DMA_DISABLE_IT(&SerialNo1.DMA_Rx_Handle, DMA_IT_HT);
+        #else
         HAL_UART_Receive_IT(&SerialNo1.handle, &SerialNo1.tempData, 1);
+        #endif
+        
         SerialNo1.Instance = INITIALIZED;
     #endif
 

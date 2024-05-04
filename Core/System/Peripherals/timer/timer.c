@@ -256,7 +256,7 @@ void AdvanceTimer8_Init(void)
 #if TIMER10_ENABLE
 #endif
 
-void Timer_Initialise(void)
+__weak void Timer_Initialise(void)
 {
     #if TIMER3_ENABLE
     GeneralTimer3_Init();
@@ -276,7 +276,7 @@ void Timer_Initialise(void)
 
 
 
-void ConfigureTimeForRunTimeStats(void)
+__weak void ConfigureTimeForRunTimeStats(void)
 {
     // 取决于选择哪个定时器作为FreeRTOS统计使用的节拍计数器
     #if TIMER3_ENABLE

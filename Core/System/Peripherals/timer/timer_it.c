@@ -39,6 +39,7 @@ void TIM8_CC_IRQHandler(void)
 
 int32_t encode_count_time = 0;
 uint16_t timeOverFlowFlag = 0;
+uint32_t timeCounter = 0;
 #if SYS_FREERTOS_ENABLE
 uint32_t FreeRTOSRunTimeTicks = 0;          /* FreeRTOS时间统计所用的节拍计数器 */
 #endif
@@ -50,13 +51,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim->Instance == TIM1)
     {
         #if TIMER1_ENABLE
+        timeOverFlowFlag |= TIMER1_TIMEOUT;
         #endif
     }
     
     #if TIMER2_ENABLE
     else if (htim->Instance == TIM2)
     {
-        timeOverFlowFlag |= (1 << 1); // 把第2位置一 代表该定时器溢出
+        timeOverFlowFlag |= TIMER2_TIMEOUT; // 把第2位置一 代表该定时器溢出
     }
     #endif
     
@@ -64,6 +66,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     else if (htim->Instance == TIM3)
     {
         #if GENERAL_TIMER3_ENCODER_ENABLE
+        timeOverFlowFlag |= TIMER3_TIMEOUT;
         if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&g_GeneralTimer3Handle))
         {
             --encode_count_time;
@@ -79,40 +82,44 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     #if TIMER4_ENABLE
     else if (htim->Instance == TIM4)
     {
-        timeOverFlowFlag |= (1 << 3); // 把第4位置一 代表该定时器溢出
+        timeOverFlowFlag |= TIMER4_TIMEOUT; // 把第4位置一 代表该定时器溢出
     }
     #endif
     #if TIMER5_ENABLE
     else if (htim->Instance == TIM5)
     {
-        timeOverFlowFlag |= (1 << 4); // 把第5位置一 代表该定时器溢出
+        timeOverFlowFlag |= TIMER5_TIMEOUT; // 把第5位置一 代表该定时器溢出
     }
     #endif
     #if TIMER6_ENABLE
     else if (htim->Instance == TIM6)
     {
-        timeOverFlowFlag |= (1 << 5); // 把第6位置一 代表该定时器溢出
+        timeOverFlowFlag |= TIMER6_TIMEOUT; // 把第6位置一 代表该定时器溢出
         #if SYS_FREERTOS_ENABLE
         
         #elif SYS_RT_THREAD_ENABLE
-        if (timerTimeoutEvent == RT_NULL)
+        if (++timeCounter >= 500)
         {
-            return;
+            timeCounter = 0;
+            if (timerTimeoutEvent == RT_NULL)
+            {
+                return;
+            }
+            rt_event_send(timerTimeoutEvent, TIMER6_TIMEOUT);
         }
-        rt_event_send(timerTimeoutEvent, TIMER6_TIMEOUT);
         #endif
     }
     #endif
     #if BASIC_TIMER7_ENABLE
     else if (htim->Instance == TIM7)
     {
-        timeOverFlowFlag |= (1 << 6);
+        timeOverFlowFlag |= TIMER7_TIMEOUT;
     }
     #endif
     #if TIMER8_ENABLE
     else if (htim->Instance == TIM8)
     {
-        timeOverFlowFlag |= (1 << 7); // 把第8位置一 代表该定时器溢出
+        timeOverFlowFlag |= TIMER8_TIMEOUT; // 把第8位置一 代表该定时器溢出
     }
     #endif
 }

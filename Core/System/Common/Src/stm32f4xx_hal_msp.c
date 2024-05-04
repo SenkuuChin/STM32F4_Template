@@ -57,13 +57,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         
         GPIO_InitStructure.Pin = SERIAL_COM1_TX_PIN;
         GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStructure.Pull = GPIO_PULLUP;
+        GPIO_InitStructure.Pull = GPIO_NOPULL;
         GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
         GPIO_InitStructure.Alternate = SERIAL_COM1_AF;
         
         HAL_GPIO_Init(SERIAL_COM1_TX_PIN_PORT, &GPIO_InitStructure);
         
         GPIO_InitStructure.Pin = SERIAL_COM1_RX_PIN;
+        GPIO_InitStructure.Pull = GPIO_PULLUP;
         GPIO_InitStructure.Alternate = SERIAL_COM1_AF;
         HAL_GPIO_Init(SERIAL_COM1_RX_PIN_PORT, &GPIO_InitStructure);
     

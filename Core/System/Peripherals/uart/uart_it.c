@@ -72,6 +72,12 @@ void ReceiveHandler(SerialTypeDef* serialNo)
 extern void Command_Scan(void);
 #endif
 
+__IO Bool UART_TransmitSuccessFlag = FALSE;
+
+#if SYS_RT_THREAD_ENABLE
+extern rt_mq_t data_mq;
+#endif
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1)
@@ -104,14 +110,223 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     #endif
 }
 
+// 用于接收不定长数据，配合DMA
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+    // 进入该函数说明触发了空闲中断，一帧数据已经完毕
+    if (huart->Instance == USART1)
+    {
+        #if SERIAL_COM1_ENABLE
+            #if SERIAL_COM1_DMA_ENABLE
+            
+                // HAL_UART_Transmit_DMA(huart, (uint8_t *)SerialNo1.data, Size);
+                #if SYS_RT_THREAD_ENABLE
+                HandleResult result = OK;
+                rt_err_t rtRet = RT_EOK;
+                rtRet = rt_mq_send(data_mq,     /* 写入（发送）队列的ID(句柄) */
+                                SerialNo1.data, /* 写入（发送）的数据 */
+                                Size);          /* 数据的长度 */
+                if (rtRet != RT_EOK)
+                {
+                    uint8_t errorInfo[] = "Push to quene faild!\r\n";
+                    HAL_UART_Transmit_DMA(huart, errorInfo, sizeof(errorInfo) - 1);
+                }
+                #endif
+            #endif
+        #endif
+    }
+    #if SERIAL_COM2_ENABLE
+    else if (huart->Instance == USART2)
+    {
+        #if SERIAL_COM2_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM3_ENABLE
+    else if (huart->Instance == USART3)
+    {
+        #if SERIAL_COM3_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM4_ENABLE
+    else if (huart->Instance == UART4)
+    {
+        #if SERIAL_COM4_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM5_ENABLE
+    else if (huart->Instance == UART5)
+    {
+        #if SERIAL_COM5_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM6_ENABLE
+    else if (huart->Instance == USART6)
+    {
+        #if SERIAL_COM6_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+}
+
+// 接收一半时的中断，一般关闭，除非是要乒乓缓存的才需要开启
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART1)
+    {
+        #if SERIAL_COM1_ENABLE
+            #if SERIAL_COM1_DMA_ENABLE
+                
+            #endif
+        #endif
+    }
+    #if SERIAL_COM2_ENABLE
+    else if (huart->Instance == USART2)
+    {
+        #if SERIAL_COM2_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM3_ENABLE
+    else if (huart->Instance == USART3)
+    {
+        #if SERIAL_COM3_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM4_ENABLE
+    else if (huart->Instance == UART4)
+    {
+        #if SERIAL_COM4_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM5_ENABLE
+    else if (huart->Instance == UART5)
+    {
+        #if SERIAL_COM5_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM6_ENABLE
+    else if (huart->Instance == USART6)
+    {
+        #if SERIAL_COM6_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    
+}
+
+void USART_DMA_IRQHandler(UART_HandleTypeDef* huart)
+{
+    if (huart->Instance == USART1)
+    {
+        #if SERIAL_COM1_ENABLE
+        if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) == RESET)
+        {
+            return;
+        }
+        // 清除空闲中断
+        __HAL_UART_CLEAR_IDLEFLAG(huart);
+        
+        // 处理当前数据的偏移
+        #endif
+    }
+    #if SERIAL_COM2_ENABLE
+    else if (huart->Instance == USART2)
+    {
+        if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) == RESET)
+        {
+            return;
+        }
+        // 清除空闲中断
+        __HAL_UART_CLEAR_IDLEFLAG(huart);
+        
+        // 处理当前数据的偏移
+    }
+    #endif
+    #if SERIAL_COM3_ENABLE
+    else if (huart->Instance == USART3)
+    {
+        if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) == RESET)
+        {
+            return;
+        }
+        // 清除空闲中断
+        __HAL_UART_CLEAR_IDLEFLAG(huart);
+        
+        // 处理当前数据的偏移
+    }
+    #endif
+    #if SERIAL_COM4_ENABLE
+    else if (huart->Instance == UART4)
+    {
+        if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) == RESET)
+        {
+            return;
+        }
+        // 清除空闲中断
+        __HAL_UART_CLEAR_IDLEFLAG(huart);
+        
+        // 处理当前数据的偏移
+    }
+    #endif
+    #if SERIAL_COM5_ENABLE
+    else if (huart->Instance == UART5)
+    {
+        if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) == RESET)
+        {
+            return;
+        }
+        // 清除空闲中断
+        __HAL_UART_CLEAR_IDLEFLAG(huart);
+        
+        // 处理当前数据的偏移
+    }
+    #endif
+    #if SERIAL_COM6_ENABLE
+    else if (huart->Instance == USART6)
+    {
+        if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) == RESET)
+        {
+            return;
+        }
+        // 清除空闲中断
+        __HAL_UART_CLEAR_IDLEFLAG(huart);
+        
+        // 处理当前数据的偏移
+    }
+    #endif
+}
+
 #if SERIAL_COM1_ENABLE
 void USART1_IRQHandler(void)
 {
+    #if !SERIAL_COM1_DMA_ENABLE
     uint32_t timeout = 0;
     uint32_t maxDelay = 0x1FFFF;
-
+    #endif
+    
+    #if SERIAL_COM1_DMA_ENABLE
+    // USART_DMA_IRQHandler(&SerialNo1.handle);
+    #endif
     HAL_UART_IRQHandler(&SerialNo1.handle); 
 
+    #if !SERIAL_COM1_DMA_ENABLE
     timeout = 0;
     while(HAL_UART_GetState(&SerialNo1.handle) != HAL_UART_STATE_READY)
     {
@@ -130,6 +345,9 @@ void USART1_IRQHandler(void)
             break;
         }
     }
+    #else
+    HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo1.handle, (uint8_t *)SerialNo1.data, SERIAL_DATA_LENGTH);
+    #endif
 }
 #endif
 
@@ -219,3 +437,108 @@ void USART6_IRQHandler(void)
     }
 }
 #endif
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART1)
+    {
+        #if SERIAL_COM1_ENABLE
+            #if SERIAL_COM1_DMA_ENABLE
+                UART_TransmitSuccessFlag = TRUE;
+            #endif
+        #endif
+    }
+    #if SERIAL_COM2_ENABLE
+    else if (huart->Instance == USART2)
+    {
+        #if SERIAL_COM2_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM3_ENABLE
+    else if (huart->Instance == USART3)
+    {
+        #if SERIAL_COM3_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM4_ENABLE
+    else if (huart->Instance == UART4)
+    {
+        #if SERIAL_COM4_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM5_ENABLE
+    else if (huart->Instance == UART5)
+    {
+        #if SERIAL_COM5_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM6_ENABLE
+    else if (huart->Instance == USART6)
+    {
+        #if SERIAL_COM6_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+}
+
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
+{
+    if (huart->Instance == USART1)
+    {
+        #if SERIAL_COM1_ENABLE
+            #if SERIAL_COM1_DMA_ENABLE
+                HAL_UART_Receive_DMA(&SerialNo1.handle, (uint8_t *)SerialNo1.data, SERIAL_DATA_LENGTH);
+            #endif
+        #endif
+    }
+    #if SERIAL_COM2_ENABLE
+    else if (huart->Instance == USART2)
+    {
+        #if SERIAL_COM2_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM3_ENABLE
+    else if (huart->Instance == USART3)
+    {
+        #if SERIAL_COM3_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM4_ENABLE
+    else if (huart->Instance == UART4)
+    {
+        #if SERIAL_COM4_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM5_ENABLE
+    else if (huart->Instance == UART5)
+    {
+        #if SERIAL_COM5_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+    #if SERIAL_COM6_ENABLE
+    else if (huart->Instance == USART6)
+    {
+        #if SERIAL_COM6_DMA_ENABLE
+            
+        #endif
+    }
+    #endif
+}

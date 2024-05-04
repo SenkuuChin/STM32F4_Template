@@ -6,9 +6,12 @@
 #if SYS_TIMER_ENABLE
 #include "Peripherals/timer/timer.h"
 #endif
+#include "Peripherals/dma/dma.h"
+
 
 void PeripheralInitialize(void)
 {
+    DMA_Init();
     #if SYS_SERIAL_ENABLE
         Serial_Init();
     #endif
@@ -19,7 +22,7 @@ void PeripheralInitialize(void)
     Timer_Initialise();
     #endif
 
-    #if SYS_SERIAL_ENABLE
+    #if SYS_SERIAL_ENABLE && SYS_SHOW_DEBUG_INFO_ENABLE
         SerialPrint(DEBUG_INFO_OUT_DEFAULT_SERIAL, "Connected successfully!");
     #endif
 }
