@@ -1,7 +1,10 @@
 #include "AnoUpperHelper.h"
 #include "my_version.h"
-
+#include "sram_helper.h"
 #include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
+
 /*
  * 匿名上位机帮助类
  * 适配匿名助手、匿名上位机
@@ -80,6 +83,85 @@ void AnoAssistDeviceInfoGet(void)
     /* 校验 */
     AnoCheckCalc(data);
     
-    SerialSendData(COMMAND_DEFAULT_SERIAL, (char *)data, dataLength + 6 + 2);
+    SerialSendDataDMA(COMMAND_DEFAULT_SERIAL, data, dataLength + 6 + 2);
+}
+
+void AnoAssistantLogOutput(Bool withNum, Bool needPrint,
+    LogColor_TypeDef color, int32_t num,
+    uint8_t* str,
+    ...
+    )
+{
+    char* buffer = NULL;
+    uint16_t strLength = 0;
+    uint8_t* data = NULL;
+    data = SRAMHelper.Malloc(SRAM_INTERNAL, sizeof(uint8_t) * strLength + sizeof(int32_t) + 2);
+    if (data == NULL)
+    {
+        SRAMHelper.Free(SRAM_INTERNAL, data);
+        return;
+    }
+    
+    if (needPrint)
+    {
+        buffer = SRAMHelper.Malloc(SRAM_INTERNAL, PRINT_TEMP_DATA_LENGTH);
+        if (buffer == NULL)
+        {
+            SRAMHelper.Free(SRAM_INTERNAL, buffer);
+            return;
+        }
+        va_list args;
+        va_start(args, str);
+        vsnprintf(buffer, PRINT_TEMP_DATA_LENGTH, (const char*)str, args);
+        strLength = strlen(buffer);
+    }
+    else
+    {
+        strLength = strlen((char *)str);
+    }
+    
+    /* 帧头 */
+    data[0] = 0xAB;
+    data[1] = deviceInfo.deviceID;
+    data[2] = ANO_UPPER_ADDR;
+    
+    if (withNum)
+    {
+        data[3] = LOG_OUTPUT_STR_NUM;
+        // 数据长度
+        strLength += 4;    // 多一个 int32 四个字节
+        data[4] = strLength;
+        data[5] = strLength >> 8;
+        
+        data[6] = num;
+        data[7] = num >> 8;
+        data[8] = num >> 16;
+        data[9] = num >> 24;
+        COPY_DATA_TO(str, data, 10, 10 + strLength + 6);
+    }
+    else
+    {
+        data[3] = LOG_OUTPUT_STR;
+        strLength += 1; // color 数据
+        data[4] = strLength;
+        data[5] = strLength >> 8;
+        data[6] = color;
+        if (needPrint)
+        {
+            COPY_DATA_TO(buffer, data, 7, 7 + strLength + 6);
+        }
+        else
+        {
+            COPY_DATA_TO(str, data, 7, 7 + strLength + 6);
+        }
+    }
+    AnoCheckCalc(data);
+    SerialSendDataDMA(COMMAND_DEFAULT_SERIAL, data, data[4] + (data[5] * 256) + 6 + 2);
+    if (needPrint || buffer != NULL)
+    {
+        SRAMHelper.Free(SRAM_INTERNAL, buffer);
+        buffer = NULL;
+    }
+    SRAMHelper.Free(SRAM_INTERNAL, data);
 }
 

@@ -40,6 +40,9 @@
     
     void SerialDataGet(SerialType serialType, char* refData, uint16_t *refLength,
                         Bool isGetLength, Bool isGetString, Bool isPrintUse);
+    
+    void SerialSendDataDMA(SerialType serialType, uint8_t* data, uint32_t size);
+    
     #ifdef __cplusplus
     }
     #endif

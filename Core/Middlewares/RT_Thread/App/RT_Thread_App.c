@@ -22,7 +22,7 @@ void LED1_ThreadEntry(void *parameter)
 {
     rt_uint32_t recved;
     rt_err_t result = RT_EOK;
-    while (1)
+    while (TRUE)
     {
         /* 等待接收事件标志 */
         result = rt_event_recv(timerTimeoutEvent,               /* 事件对象句柄 */
@@ -33,9 +33,9 @@ void LED1_ThreadEntry(void *parameter)
         if (recved == TIMER6_TIMEOUT)
         {
             LED0_TOGGLE();
+            AnoAssistantLogPrintf(LOG_COLOR_GREEN, (uint8_t *)"Data is %d", recved);
+            // AnoAssistantLog(LOG_COLOR_RED, (uint8_t *)"Log ok!");
         }
-        
-        // rt_thread_delay(500);
     }
 }
 
@@ -83,7 +83,7 @@ void AppThreadStartEntry(void *arg)
     LED1_Thread = RTOSThreadCreate("LED1_Thread",
                                    LED1_ThreadEntry,
                                    RT_NULL,
-                                   128,
+                                   512,
                                    3,
                                    20);
     

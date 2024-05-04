@@ -127,7 +127,21 @@
         SPEICAL_DATA = 0xFB
     } OtherFuncID_TypeDef; /* ∆‰À¸÷° */
     
+    typedef enum
+    {
+        LOG_COLOR_DEFUALT = 0,
+        LOG_COLOR_RED,
+        LOG_COLOR_GREEN
+    } LogColor_TypeDef;
+    
+    #define AnoAssistantLog(color, str)             AnoAssistantLogOutput(FALSE, FALSE, color, 0, str)
+    #define AnoAssistantLogPrintf(color, str, ...)  AnoAssistantLogOutput(FALSE, TRUE, color, 0, str, __VA_ARGS__)
+    #define AnoAssistantLogWithNum(num, str)        AnoAssistantLogOutput(TRUE, FALSE, 0, num, str)
+    
     void AnoAssistDeviceInfoGet(void);
+    void AnoAssistantLogOutput(Bool withNum, Bool needPrint,
+                                LogColor_TypeDef color, int32_t num,
+                                uint8_t* str, ...);
     
     Bool AnoCheckData(uint8_t* inData);
 #endif

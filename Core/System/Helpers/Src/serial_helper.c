@@ -85,11 +85,11 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     rt_enter_critical();
     #endif
     /* 定义一个发送缓冲区，存放格式化后的数据 */
-    char *buffer = NULL, *str = NULL;
+    char *str = NULL;
     #if SYS_SRAM_MANAGE_ENABLE
-    buffer = SRAMHelper.Malloc(SRAM_INTERNAL, PRINT_TEMP_DATA_LENGTH);
+    char *buffer = SRAMHelper.Malloc(SRAM_INTERNAL, PRINT_TEMP_DATA_LENGTH);
     #else
-    buffer = (char*)malloc(sizeof(char) * PRINT_TEMP_DATA_LENGTH);
+    char buffer[PRINT_TEMP_DATA_LENGTH] = { 0 };
     #endif
     RESET_ARRAY(buffer, PRINT_TEMP_DATA_LENGTH);
     uint16_t length = 0;
@@ -193,11 +193,11 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     }
     #if SYS_SRAM_MANAGE_ENABLE
     SRAMHelper.Free(SRAM_INTERNAL, buffer);
+    buffer = NULL;
     #else
-    free(buffer);
+    
     #endif
     str = NULL;
-    buffer = NULL;
     serialLock = NULL;
     #if SYS_FREERTOS_ENABLE
     taskEXIT_CRITICAL();
@@ -207,6 +207,58 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     #endif
 }
 
+void SerialSendDataDMA(SerialType serialType, uint8_t* data, uint32_t size)
+{
+    switch (serialType)
+    {
+        case Serial1:
+            #if SERIAL_COM1_ENABLE
+                #if SERIAL_COM1_DMA_ENABLE
+                HAL_UART_Transmit_DMA(&SerialNo1.handle, (uint8_t *)data, size);
+                // 等待TX的DMA的传输完成。F407IGT6 中USART1的DMA是Stream7，所以使用 DMA_FLAG_TCIF3_7
+                // while (__HAL_DMA_GET_FLAG(&SerialNo1.DMA_Tx_Handle, DMA_FLAG_TCIF3_7) == RESET);
+                #endif
+            #endif
+            break;
+        case Serial2:
+            #if SERIAL_COM2_ENABLE
+                #if SERIAL_COM2_DMA_ENABLE
+                HAL_UART_Transmit_DMA(&SerialNo2.handle, (uint8_t *)data, size);
+                #endif
+            #endif
+            break;
+        case Serial3:
+            #if SERIAL_COM3_ENABLE
+                #if SERIAL_COM3_DMA_ENABLE
+                HAL_UART_Transmit_DMA(&SerialNo3.handle, (uint8_t *)data, size);
+                #endif
+            #endif
+            break;
+        case Serial4:
+            #if SERIAL_COM4_ENABLE
+                #if SERIAL_COM4_DMA_ENABLE
+                HAL_UART_Transmit_DMA(&SerialNo4.handle, (uint8_t *)data, size);
+                #endif
+            #endif
+            break;
+        case Serial5:
+            #if SERIAL_COM5_ENABLE
+                #if SERIAL_COM5_DMA_ENABLE
+                HAL_UART_Transmit_DMA(&SerialNo5.handle, (uint8_t *)data, size);
+                #endif
+            #endif
+            break;
+        case Serial6:
+            #if SERIAL_COM6_ENABLE
+                #if SERIAL_COM6_DMA_ENABLE
+                HAL_UART_Transmit_DMA(&SerialNo6.handle, (uint8_t *)data, size);
+                #endif
+            #endif
+            break;
+        default:
+            break;
+    }
+}
 
 void SerialDataGet(SerialType serialType, char* refData, uint16_t *refLength,
                     Bool isGetLength, Bool isGetString, Bool isPrintUse)
