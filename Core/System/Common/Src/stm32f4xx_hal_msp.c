@@ -184,3 +184,197 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
     }
     #endif
 }
+
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM1)
+    {
+        #if TIMER1_ENABLE
+        #endif
+    }
+    #if TIMER2_ENABLE
+    else if (htim->Instance == TIM2)
+    {
+        __HAL_RCC_TIM2_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM2_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM2_IRQn);
+    }
+    #endif
+    #if TIMER3_ENABLE
+    else if (htim->Instance == TIM3)
+    {
+        __HAL_RCC_TIM3_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM3_IRQn);
+    }
+    #endif
+    #if TIMER4_ENABLE
+    else if (htim->Instance == TIM4)
+    {
+        __HAL_RCC_TIM4_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM4_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM4_IRQn);
+    }
+    #endif
+    #if TIMER5_ENABLE
+    else if (htim->Instance == TIM5)
+    {
+        __HAL_RCC_TIM5_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM5_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM5_IRQn);
+    }
+    #endif
+    #if TIMER6_ENABLE
+    else if (htim->Instance == TIM6)
+    {
+        __HAL_RCC_TIM6_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 6, 0);
+        HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+    }
+    #endif
+    #if TIMER7_ENABLE
+    else if (htim->Instance == TIM7)
+    {
+        __HAL_RCC_TIM7_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM7_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM7_IRQn);
+    }
+    #endif
+    #if TIMER8_ENABLE
+    else if (htim->Instance == TIM8)
+    {
+        __HAL_RCC_TIM8_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM8_CC_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
+    }
+    #endif
+    #if TIMER9_ENABLE
+    else if (htim->Instance == TIM9)
+    {
+        __HAL_RCC_TIM9_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM9_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM9_IRQn);
+    }
+    #endif
+    #if TIMER10_ENABLE
+    else if (htim->Instance == TIM10)
+    {
+        __HAL_RCC_TIM10_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM10_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM10_IRQn);
+    }
+    #endif
+}
+
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
+{
+    if(tim_baseHandle->Instance == TIM1)
+    {
+        #if TIMER1_ENABLE
+        __HAL_RCC_TIM1_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM1_CC_IRQn);
+        #endif
+    }
+    #if TIMER2_ENABLE
+    else if(tim_baseHandle->Instance == TIM2)
+    {
+        __HAL_RCC_TIM2_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM2_IRQn);
+    }
+    #endif
+    #if TIMER3_ENABLE
+    else if(tim_baseHandle->Instance == TIM3)
+    {
+        __HAL_RCC_TIM3_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM3_IRQn);
+    }
+    #endif
+    #if TIMER4_ENABLE
+    else if(tim_baseHandle->Instance == TIM4)
+    {
+        __HAL_RCC_TIM4_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM4_IRQn);
+    }
+    #endif
+    #if TIMER5_ENABLE
+    else if(tim_baseHandle->Instance == TIM5)
+    {
+        __HAL_RCC_TIM5_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM5_IRQn);
+    }
+    #endif
+    #if TIMER6_ENABLE
+    else if(tim_baseHandle->Instance==TIM6)
+    {
+        __HAL_RCC_TIM6_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM6_DAC_IRQn);
+    }
+    #endif
+    #if TIMER7_ENABLE
+    else if(tim_baseHandle->Instance==TIM7)
+    {
+        __HAL_RCC_TIM7_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM7_IRQn);
+    }
+    #endif
+    #if TIMER8_ENABLE
+    else if(tim_baseHandle->Instance == TIM8)
+    {
+        __HAL_RCC_TIM6_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM8_CC_IRQn);
+    }
+    #endif
+    #if TIMER9_ENABLE
+    else if(tim_baseHandle->Instance == TIM9)
+    {
+        __HAL_RCC_TIM9_CLK_DISABLE();
+        HAL_NVIC_DisableIRQ(TIM1_BRK_TIM9_IRQn);
+    }
+    #endif
+}
+
+void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM1)
+    {
+        #if TIMER1_ENABLE && TIMER1_PWM_MODE_ENABLE
+        
+        #endif
+    }
+    #if TIMER2_ENABLE && TIMER2_PWM_MODE_ENABLE
+    else if (htim->Instance == TIM2)
+    {
+        __HAL_RCC_TIM2_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM2_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM2_IRQn);
+    }
+    #endif
+    #if TIMER3_ENABLE && TIMER3_PWM_MODE_ENABLE
+    else if (htim->Instance == TIM3)
+    {
+        __HAL_RCC_TIM3_CLK_ENABLE();
+        HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(TIM3_IRQn);
+    }
+    #endif
+    #if TIMER4_ENABLE && TIMER4_PWM_MODE_ENABLE
+    else if (htim->Instance == TIM4)
+    {
+        __HAL_RCC_TIM4_CLK_ENABLE();
+    }
+    #endif
+    #if TIMER5_ENABLE && TIMER5_PWM_MODE_ENABLE
+    else if (htim->Instance == TIM5)
+    {
+        __HAL_RCC_TIM5_CLK_ENABLE();
+    }
+    #endif
+    #if TIMER8_ENABLE && TIMER8_PWM_MODE_ENABLE
+    else if (htim->Instance == TIM8)
+    {
+        __HAL_RCC_TIM8_CLK_ENABLE();
+    }
+    #endif
+    
+}
+

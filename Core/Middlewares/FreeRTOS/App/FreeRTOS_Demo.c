@@ -14,7 +14,7 @@ TaskHandle_t StartTask_Handler;             /* 任务句柄 */
 /* TASK1 任务 配置
  * 包括: 任务句柄 任务优先级 堆栈大小 创建任务
  */
-#define TASK1_PRIO 2                        /* 任务优先级 */
+#define TASK1_PRIO 3                        /* 任务优先级 */
 #define TASK1_STK_SIZE 128                  /* 任务堆栈大小 */
 TaskHandle_t Task1Task_Handler;             /* 任务句柄 */
 
@@ -28,7 +28,7 @@ TaskHandle_t Task2Task_Handler;             /* 任务句柄 */
 /* TASK3 任务 配置
  * 包括: 任务句柄 任务优先级 堆栈大小 创建任务
  */
-#define TASK3_PRIO 4                        /* 任务优先级 */
+#define TASK3_PRIO 3                        /* 任务优先级 */
 #define TASK3_STK_SIZE 128                  /* 任务堆栈大小 */
 TaskHandle_t Task3Task_Handler;             /* 任务句柄 */
 
@@ -40,6 +40,11 @@ TaskHandle_t Task3Task_Handler;             /* 任务句柄 */
 TaskHandle_t Task4Task_Handler;             /* 任务句柄 */
 
 // FreeRTOS 中，优先级数字越大的证明其优先级越高。STM32中断优先级是 数字越小优先级越高。
+
+EventGroupHandle_t Event_Handle = NULL;
+
+// 消息队列，配合接收指令来使用
+QueueHandle_t commandQueue = NULL;
 
 void Task1(void *pvParameters)
 {
@@ -74,16 +79,20 @@ void Task1(void *pvParameters)
             default:
                 break;
         }
-        vTaskDelay(10);
+        
     }
 }
 
 void Task2(void *pvParameters)
 {
+    uint8_t commandItem[30] = { 0 };
     while (TRUE)
     {
-        SerialPrintReceivedData(DEBUG_INFO_OUT_DEFAULT_SERIAL);
-        vTaskDelay(10);
+        // SerialPrintReceivedData(DEBUG_INFO_OUT_DEFAULT_SERIAL);
+        if (xQueueReceive(commandQueue, commandItem, portMAX_DELAY) == pdPASS)
+        {
+            SerialSendDataByDMA(DEBUG_INFO_OUT_DEFAULT_SERIAL, (char *)commandItem, 30);
+        }
     }
 }
 
@@ -91,13 +100,22 @@ void Task3(void *pvParameters)
 {
     while (TRUE)
     {
+        /* xEventGroupWaitBits 函数参数说明
+         * xEventGroup：事件组句柄，这是一个之前通过 xEventGroupCreate 创建的事件组。
+         * uxBitsToWaitFor：这是一个位掩码，指定任务在继续执行前等待设置的位。
+         * xClearOnExit：如果这个参数为 pdTRUE，函数返回时将会清除在 uxBitsToWaitFor 中设置的位。如果为 pdFALSE，则不会改变这些位。
+         * xWaitForAllBits：如果这个参数为 pdTRUE，任务会等待所有指定的位都被设置。如果为 pdFALSE，则任务会在任何指定的位被设置时返回。
+         * xTicksToWait：等待事件位被设置的最大时间，以节拍数（ticks）表示。如果设置为 portMAX_DELAY，则任务会无限期等待，直到所需的位被设置。
+         * 等待事件标志 0 和事件标志 1
+         * 如果成功等待到了事件标志 0 和 1，则清零事件标志 0 和 1
+         * 等待的方式为逻辑与，即事件标志 0 和 1 需要被同时设置
+         */
+        xEventGroupWaitBits((EventGroupHandle_t )Event_Handle,
+                            (EventBits_t )TIMER6_TIMEOUT,
+                            (BaseType_t )pdTRUE,
+                            (BaseType_t )pdFALSE,
+                            (TickType_t )portMAX_DELAY);
         LED0_TOGGLE();
-        vTaskDelay(500);
-        LED0_TOGGLE();
-        LED1_TOGGLE();
-        vTaskDelay(500);
-        LED1_TOGGLE();
-        vTaskDelay(500);
     }
 }
 
@@ -132,6 +150,12 @@ void StartTask(void *pvParameters)
 
 void App_Run(void)
 {
+    HandleResult result = OK;
+    Event_Handle = xEventGroupCreate();
+    SYSTEM_ASSERT_EXPRESS(Event_Handle == NULL, result);
+    // 创建一个长度是100，每个消息深度是30的队列
+    commandQueue = xQueueCreate(100, sizeof(char) * 30);
+    SYSTEM_ASSERT_EXPRESS(commandQueue == NULL, result);
     xTaskCreate((TaskFunction_t)StartTask,              /* 任务函数 */
                 (const char*   )"StartTask",            /* 任务名称 */
                 (uint16_t      )START_STK_SIZE,         /* 任务堆栈大小（字为单位） */

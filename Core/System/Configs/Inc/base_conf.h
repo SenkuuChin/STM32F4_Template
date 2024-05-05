@@ -56,6 +56,14 @@
         } \
     } while (0)
     
+    #define APPEND_DATA(orgArr, desArr, start, end)     do { \
+        uint32_t _i_, _j_; \
+        for (_i_ = start, _j_ = 0; _i_ < end; ++_i_, ++_j_) \
+        { \
+            desArr[_i_] = orgArr[_j_]; \
+        } \
+    } while (0)
+    
     #define LIMIT(x, max, min)                  ((x < max ) ? ((x > min ) ? x : min) : max)
     #define MAX(a, b, c)                        (a > b ? a : b > c ? b : c)
     #define MIN(a, b, c)                        (a < b ? a : b < c ? b : c)

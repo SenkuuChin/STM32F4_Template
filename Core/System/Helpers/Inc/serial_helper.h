@@ -19,11 +19,17 @@
     #define DEBUG_INFO_OUT_DEFAULT_SERIAL       Serial1
     #define COMMAND_DEFAULT_SERIAL              Serial1
 
-    #define SerialPrint(serialType, str)                    SerialOutput(serialType, TRUE, FALSE, 0, TRUE, str)
-    #define SerialPrint_NoDash(serialType, str)             SerialOutput(serialType, FALSE, FALSE, 0, TRUE, str)
-    #define SerialSendData(serialType, str, length)         SerialOutput(serialType, FALSE, TRUE, length, TRUE, str)
-    #define SerialPrintf(serialType, str, ...)              SerialOutput(serialType, TRUE, FALSE, 0, FALSE, str, __VA_ARGS__)
-    #define SerialPrintf_NoDash(serialType, str, ...)       SerialOutput(serialType, FALSE, FALSE, 0, FALSE, str, __VA_ARGS__)
+    #define SerialPrint(serialType, str)                    SerialOutput(serialType, TRUE, FALSE, 0, TRUE, TRUE, str)
+    #define SerialPrint_NoDash(serialType, str)             SerialOutput(serialType, FALSE, FALSE, 0, TRUE, TRUE, str)
+    #define SerialSendData(serialType, str, length)         SerialOutput(serialType, FALSE, TRUE, length, TRUE, TRUE, str)
+    #define SerialPrintf(serialType, str, ...)              SerialOutput(serialType, TRUE, FALSE, 0, FALSE, TRUE, str, __VA_ARGS__)
+    #define SerialPrintf_NoDash(serialType, str, ...)       SerialOutput(serialType, FALSE, FALSE, 0, FALSE, TRUE, str, __VA_ARGS__)
+    
+    #define SerialPrintByDMA(serialType, str)                    SerialOutput(serialType, TRUE, FALSE, 0, TRUE, FALSE, str)
+    #define SerialPrint_NoDashByDMA(serialType, str)             SerialOutput(serialType, FALSE, FALSE, 0, TRUE, FALSE, str)
+    #define SerialSendDataByDMA(serialType, str, length)         SerialOutput(serialType, FALSE, TRUE, length, TRUE, FALSE, str)
+    #define SerialPrintfByDMA(serialType, str, ...)              SerialOutput(serialType, TRUE, FALSE, 0, FALSE, FALSE, str, __VA_ARGS__)
+    #define SerialPrintf_NoDashByDMA(serialType, str, ...)       SerialOutput(serialType, FALSE, FALSE, 0, FALSE, FALSE, str, __VA_ARGS__)
     
     #define SerialGetDataLenth(serialType, len)             SerialDataGet(serialType, NULL, len, TRUE, FALSE, FALSE)
     #define SerialGetString(serialType, refData)            SerialDataGet(serialType, refData, NULL, FALSE, TRUE, FALSE)
@@ -35,7 +41,7 @@
     void Serial_Init(void);
     void SerialOutput(SerialType serialType, uint8_t isNeedDash,
                         uint8_t isSpecifyLength, uint16_t dataLength,
-                        uint8_t isOnlyPrint,
+                        uint8_t isOnlyPrint, uint8_t needCriticalZone,
                         const char* format, ...);
     
     void SerialDataGet(SerialType serialType, char* refData, uint16_t *refLength,

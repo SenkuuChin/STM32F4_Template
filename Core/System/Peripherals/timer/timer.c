@@ -121,9 +121,9 @@ void BasicTimer6_ResetCounter(void)
 }
 void BasicTimer6_Init(void)
 {
-    if (g_BasicTimer6Handle.State == HAL_TIM_STATE_RESET)
+    if (g_BasicTimer6Handle.Instance == TIM6)
     {
-        return;
+        HAL_TIM_Base_DeInit(&g_BasicTimer6Handle);
     }
     // 本次工程中TIM6定时 1ms一个周期
     g_BasicTimer6Handle.Instance = TIM6;

@@ -31,7 +31,7 @@
     #define SYS_WWDG_ENABLE                     0
     // 默认通信优先级。M 代表主优先级 S代表子优先级
     // 除非有需要则在具体代码调整，否则默认统一
-    #define SYS_DEFAULT_COMMINICATE_M_PRIORITY  2
+    #define SYS_DEFAULT_COMMINICATE_M_PRIORITY  5
     #define SYS_DEFAULT_COMMINICATE_S_PRIORITY  0
     /* Debug 方式选择 */
     /* pick Debug method */

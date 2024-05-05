@@ -455,6 +455,11 @@
           <GroupName>System/Peripherals</GroupName>
           <Files>
             <File>
+              <FileName>peripheral_index.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Core\System\Peripherals\peripheral_index.c</FilePath>
+            </File>
+            <File>
               <FileName>can.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Core\System\Peripherals\can\can.c</FilePath>
@@ -513,11 +518,6 @@
               <FileName>uart_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Core\System\Peripherals\uart\uart_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_index.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Core\System\Peripherals\peripheral_index.c</FilePath>
             </File>
           </Files>
         </Group>
