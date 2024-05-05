@@ -11,7 +11,7 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
-      <uAC6>0</uAC6>
+      <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IGTx</Device>
@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -323,7 +323,7 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>2</wLevel>
+            <wLevel>3</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--diag_suppress=177 --diag_suppress=188 --diag_suppress=550 --diag_suppress=111</MiscControls>
+              <MiscControls>-Wno-invalid-source-encoding -Wno-deprecated-non-prototype</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
               <IncludePath>D:\Libraries\STM32\HAL\STM32Cube_FW_F4_V1.27.1\Drivers\CMSIS\Include;D:\Libraries\STM32\HAL\STM32Cube_FW_F4_V1.27.1\Drivers\STM32F4xx_HAL_Driver\Inc;D:\Libraries\STM32\HAL\STM32Cube_FW_F4_V1.27.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include;.\Core\System\Common\Inc;.\Core\System\Configs\Inc;.\Core\System\Helpers\Inc;.\Core\System;.\Core\Algorithm\Inc;.\Core\DAO\Inc;.\Core\Helpers\Inc;.\Core\Libraries\Inc;.\Core\Services\Inc;.\Core\Middlewares\RT_Thread\Core;D:\Libraries\RTOS\rt-thread\nano\components\finsh;D:\Libraries\RTOS\rt-thread\nano\include;D:\Libraries\RTOS\rt-thread\nano\include\libc;.\Core\Middlewares\RT_Thread\App</IncludePath>
