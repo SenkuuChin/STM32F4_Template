@@ -1,0 +1,4 @@
+FreeRTOS AC5编译器下的 port.c 文件默认是 portable/RVDS
+若使用AC6编译器 port.c 文件的路径需要改为 FreeRTOS/portable/GCC
+同时包含文件路径也要把 RVDS 改为 GCC 这个路径
+
