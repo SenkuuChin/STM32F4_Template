@@ -9,9 +9,9 @@
 #if SYS_RT_THREAD_ENABLE
 __IO uint8_t SystemInitialized = FALSE;
 #endif
-extern uint32_t timeOverFlowFlag;
+extern __IO uint32_t timeOverFlowFlag;
 
-uint16_t timeCounter = 0;
+__IO uint16_t timeCounter = 0;
 
 int main(void)
 {

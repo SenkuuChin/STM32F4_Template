@@ -38,7 +38,7 @@ void TIM8_CC_IRQHandler(void)
 #endif
 
 int32_t encode_count_time = 0;
-uint32_t timeOverFlowFlag = 0;
+__IO uint32_t timeOverFlowFlag = 0;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
