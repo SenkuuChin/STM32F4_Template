@@ -144,4 +144,7 @@
                                 uint8_t* str, ...);
     
     Bool AnoCheckData(uint8_t* inData);
+    
+    /* 上传使用的函数 */
+    #define ANO_UPLOAD_FUNC                 SerialSendDataByDMA
 #endif

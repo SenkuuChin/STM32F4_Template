@@ -56,7 +56,7 @@
         } \
     } while (0)
     
-    #define COPY_DATA_TO(orgArr, desArr, start, end)     do { \
+    #define APPEND_DATA(orgArr, desArr, start, end)     do { \
         uint32_t _i_, _j_; \
         for (_i_ = start, _j_ = 0; _i_ < end; ++_i_, ++_j_) \
         { \

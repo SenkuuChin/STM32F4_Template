@@ -1,6 +1,8 @@
 #include "AnoUpperHelper.h"
 #include "my_version.h"
+#if SYS_SRAM_MANAGE_ENABLE
 #include "sram_helper.h"
+#endif
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -78,12 +80,12 @@ void AnoAssistDeviceInfoGet(void)
     data[12] = deviceInfo.blVersion >> 8;
     data[13] = deviceInfo.communicationProtocolVersion;
     data[14] = deviceInfo.communicationProtocolVersion >> 8;
-    COPY_DATA_TO(deviceInfo.deviceName, data, 15, 15 + nameLength);
+    APPEND_DATA(deviceInfo.deviceName, data, 15, 15 + nameLength);
     
     /* ะฃั้ */
     AnoCheckCalc(data);
     
-    SerialSendDataDMA(COMMAND_DEFAULT_SERIAL, data, dataLength + 6 + 2);
+    ANO_UPLOAD_FUNC(COMMAND_DEFAULT_SERIAL, (char *)data, dataLength + 6 + 2);
 }
 
 void AnoAssistantLogOutput(Bool withNum, Bool needPrint,
@@ -92,24 +94,30 @@ void AnoAssistantLogOutput(Bool withNum, Bool needPrint,
     ...
     )
 {
-    char* buffer = NULL;
     uint16_t strLength = 0;
-    uint8_t* data = NULL;
-    data = SRAMHelper.Malloc(SRAM_INTERNAL, sizeof(uint8_t) * strLength + sizeof(int32_t) + 2);
+    #if SYS_SRAM_MANAGE_ENABLE
+    char* buffer = NULL;
+    uint8_t* data = SRAMHelper.Malloc(SRAM_INTERNAL, sizeof(uint8_t) * strLength + sizeof(int32_t) + 2);
     if (data == NULL)
     {
         SRAMHelper.Free(SRAM_INTERNAL, data);
         return;
     }
+    #else
+    char buffer[PRINT_TEMP_DATA_LENGTH] = { 0 };
+    uint8_t data[PRINT_TEMP_DATA_LENGTH] = { 0 };
+    #endif
     
     if (needPrint)
     {
+        #if SYS_SRAM_MANAGE_ENABLE
         buffer = SRAMHelper.Malloc(SRAM_INTERNAL, PRINT_TEMP_DATA_LENGTH);
         if (buffer == NULL)
         {
             SRAMHelper.Free(SRAM_INTERNAL, buffer);
             return;
         }
+        #endif
         va_list args;
         va_start(args, str);
         vsnprintf(buffer, PRINT_TEMP_DATA_LENGTH, (const char*)str, args);
@@ -137,7 +145,7 @@ void AnoAssistantLogOutput(Bool withNum, Bool needPrint,
         data[7] = num >> 8;
         data[8] = num >> 16;
         data[9] = num >> 24;
-        COPY_DATA_TO(str, data, 10, 10 + strLength + 6);
+        APPEND_DATA(str, data, 10, 10 + strLength + 6);
     }
     else
     {
@@ -148,20 +156,24 @@ void AnoAssistantLogOutput(Bool withNum, Bool needPrint,
         data[6] = color;
         if (needPrint)
         {
-            COPY_DATA_TO(buffer, data, 7, 7 + strLength + 6);
+            APPEND_DATA(buffer, data, 7, 7 + strLength + 6);
         }
         else
         {
-            COPY_DATA_TO(str, data, 7, 7 + strLength + 6);
+            APPEND_DATA(str, data, 7, 7 + strLength + 6);
         }
     }
     AnoCheckCalc(data);
-    SerialSendDataDMA(COMMAND_DEFAULT_SERIAL, data, data[4] + (data[5] * 256) + 6 + 2);
+    ANO_UPLOAD_FUNC(COMMAND_DEFAULT_SERIAL, (char *)data, data[4] + (data[5] * 256) + 6 + 2);
     if (needPrint || buffer != NULL)
     {
+        #if SYS_SRAM_MANAGE_ENABLE
         SRAMHelper.Free(SRAM_INTERNAL, buffer);
         buffer = NULL;
+        #endif
     }
+    #if SYS_SRAM_MANAGE_ENABLE
     SRAMHelper.Free(SRAM_INTERNAL, data);
+    #endif
 }
 

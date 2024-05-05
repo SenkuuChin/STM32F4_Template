@@ -70,21 +70,27 @@ void Serial_Init(void)
     UART_Init();
 }
 
-extern __IO Bool UART_TransmitSuccessFlag;
-
 __IO uint8_t serialLock = NULL;
+#if SYS_RT_THREAD_ENABLE
+extern __IO uint8_t SystemInitialized;
+#endif
+
 void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     uint8_t isSpecifyLength, uint16_t dataLength,
-    uint8_t isOnlyPrint,
+    uint8_t isOnlyPrint, uint8_t needCriticalZone,
     const char* format, ...)
 {
-    #if SYS_FREERTOS_ENABLE
-    taskENTER_CRITICAL();
-    #elif SYS_RT_THREAD_ENABLE
-    /* 进入临界段 */
-    rt_enter_critical();
-    #endif
-    /* 定义一个发送缓冲区，存放格式化后的数据 */
+    // 需要进入临界区则开启
+    if (needCriticalZone)
+    {
+        #if SYS_FREERTOS_ENABLE
+        taskENTER_CRITICAL();
+        #elif SYS_RT_THREAD_ENABLE
+        /* 进入临界段 */
+        rt_enter_critical();
+        #endif
+    }
+/* 定义一个发送缓冲区，存放格式化后的数据 */
     char *str = NULL;
     #if SYS_SRAM_MANAGE_ENABLE
     char *buffer = SRAMHelper.Malloc(SRAM_INTERNAL, PRINT_TEMP_DATA_LENGTH);
@@ -145,47 +151,207 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     {
         case Serial1:
             #if SERIAL_COM1_ENABLE
-            // 由于DMA传输需要检查是否完成上一次传输才发送下一次，与传统的发送没有区别，所以发送上还是使用传统的
-                #if SERIAL_COM1_DMA_ENABLE && 0
-                HAL_UART_Transmit_DMA(&SerialNo1.handle, (uint8_t *)str, length);
-                // 等待TX的DMA的传输完成。F407IGT6 中USART1的DMA是Stream7，所以使用 DMA_FLAG_TCIF3_7
-                while (__HAL_DMA_GET_FLAG(&SerialNo1.DMA_Tx_Handle, DMA_FLAG_TCIF3_7) == RESET);
-                // while (!UART_TransmitSuccessFlag);
-                #else
-                // HAL_UART_Transmit_IT(&SerialNo1.handle, (uint8_t *)str, length);
-                SERIAL_SEND(USART1, length, str);
-                #endif
+                if (needCriticalZone)
+                {
+                    SERIAL_SEND(USART1, length, str);
+                }
+                else
+                {
+                    #if SERIAL_COM1_DMA_ENABLE
+                    #if SYS_RT_THREAD_ENABLE
+                    // RT Thread 由于引导启动方式不一样，第一次打印的时候系统还没正常初始化完毕，中断等不会被调用，所以需要这一步骤
+                    if (SystemInitialized)
+                    {
+                    #endif
+                        HAL_UART_Transmit_DMA(&SerialNo1.handle, (uint8_t *)str, length);
+                        // 等待TX的DMA的传输完成。F407IGT6 中USART1的DMA是Stream7，所以使用 DMA_FLAG_TCIF3_7
+                        // 传输完成回调依靠中断，所以串口处不能使用临界区, 如果不使用下面的等待，传输过快就会导致数据紊乱
+                        #else
+                        // 中断传输方式也需要中断开启
+                        // HAL_UART_Transmit_IT(&SerialNo1.handle, (uint8_t *)str, length);
+                        #endif
+                        // 等待传输完成
+                        while (!SerialNo1.sentFlag);
+                    #if SYS_RT_THREAD_ENABLE
+                    }
+                    else
+                    {
+                        SERIAL_SEND(USART1, length, str);
+                    }
+                    #endif
+                }
+                SerialNo1.sentFlag = FALSE;
             #endif
             break;
         case Serial2:
+            
             #if SERIAL_COM2_ENABLE
-            SERIAL_SEND(USART2, length, str);
+            if (needCriticalZone)
+            {
+                SERIAL_SEND(USART2, length, str);
+            }
+            else
+            {
+                #if SERIAL_COM2_DMA_ENABLE
+                #if SYS_RT_THREAD_ENABLE
+                // RT Thread 由于引导启动方式不一样，第一次打印的时候系统还没正常初始化完毕，中断等不会被调用，所以需要这一步骤
+                if (SystemInitialized)
+                {
+                #endif
+                    HAL_UART_Transmit_DMA(&SerialNo2.handle, (uint8_t *)str, length);
+                    // 传输完成回调依靠中断，所以串口处不能使用临界区, 如果不使用下面的等待，传输过快就会导致数据紊乱
+                #else
+                    // 中断传输方式也需要中断开启
+                    // HAL_UART_Transmit_IT(&SerialNo2.handle, (uint8_t *)str, length);
+                #endif
+                    // 等待传输完成
+                    while (!SerialNo2.sentFlag);
+                #if SYS_RT_THREAD_ENABLE
+                }
+                else
+                {
+                    SERIAL_SEND(USART2, length, str);
+                }
+                #endif
+            }
+            SerialNo2.sentFlag = FALSE;
             #endif
             break;
         case Serial3:
             #if SERIAL_COM3_ENABLE
-            SERIAL_SEND(USART3, length, str);
+            if (needCriticalZone)
+            {
+                SERIAL_SEND(USART3, length, str);
+            }
+            else
+            {
+                #if SERIAL_COM3_DMA_ENABLE
+                #if SYS_RT_THREAD_ENABLE
+                // RT Thread 由于引导启动方式不一样，第一次打印的时候系统还没正常初始化完毕，中断等不会被调用，所以需要这一步骤
+                if (SystemInitialized)
+                {
+                #endif
+                    HAL_UART_Transmit_DMA(&SerialNo3.handle, (uint8_t *)str, length);
+                    // 传输完成回调依靠中断，所以串口处不能使用临界区, 如果不使用下面的等待，传输过快就会导致数据紊乱
+                #else
+                    // 中断传输方式也需要中断开启
+                    // HAL_UART_Transmit_IT(&SerialNo3.handle, (uint8_t *)str, length);
+                #endif
+                    // 等待传输完成
+                    while (!SerialNo3.sentFlag);
+                #if SYS_RT_THREAD_ENABLE
+                }
+                else
+                {
+                    SERIAL_SEND(USART3, length, str);
+                }
+                #endif
+            }
+            SerialNo3.sentFlag = FALSE;
             #endif
             break;
         case Serial4:
             #if SERIAL_COM4_ENABLE
-            SERIAL_SEND(UART4, length, str);
+            if (needCriticalZone)
+            {
+                SERIAL_SEND(UART4, length, str);
+            }
+            else
+            {
+                #if SERIAL_COM4_DMA_ENABLE
+                #if SYS_RT_THREAD_ENABLE
+                // RT Thread 由于引导启动方式不一样，第一次打印的时候系统还没正常初始化完毕，中断等不会被调用，所以需要这一步骤
+                if (SystemInitialized)
+                {
+                #endif
+                    HAL_UART_Transmit_DMA(&SerialNo4.handle, (uint8_t *)str, length);
+                    // 传输完成回调依靠中断，所以串口处不能使用临界区, 如果不使用下面的等待，传输过快就会导致数据紊乱
+                #else
+                    // 中断传输方式也需要中断开启
+                    // HAL_UART_Transmit_IT(&SerialNo4.handle, (uint8_t *)str, length);
+                #endif
+                    // 等待传输完成
+                    while (!SerialNo4.sentFlag);
+                #if SYS_RT_THREAD_ENABLE
+                }
+                else
+                {
+                    SERIAL_SEND(UART4, length, str);
+                }
+                #endif
+            }
+            SerialNo4.sentFlag = FALSE;
             #endif
             break;
         case Serial5:
             #if SERIAL_COM5_ENABLE
-            SERIAL_SEND(UART5, length, str);
+            if (needCriticalZone)
+            {
+                SERIAL_SEND(UART5, length, str);
+            }
+            else
+            {
+                #if SERIAL_COM5_DMA_ENABLE
+                #if SYS_RT_THREAD_ENABLE
+                // RT Thread 由于引导启动方式不一样，第一次打印的时候系统还没正常初始化完毕，中断等不会被调用，所以需要这一步骤
+                if (SystemInitialized)
+                {
+                #endif
+                    HAL_UART_Transmit_DMA(&SerialNo5.handle, (uint8_t *)str, length);
+                    // 传输完成回调依靠中断，所以串口处不能使用临界区, 如果不使用下面的等待，传输过快就会导致数据紊乱
+                #else
+                    // 中断传输方式也需要中断开启
+                    // HAL_UART_Transmit_IT(&SerialNo5.handle, (uint8_t *)str, length);
+                #endif
+                    // 等待传输完成
+                    while (!SerialNo5.sentFlag);
+                #if SYS_RT_THREAD_ENABLE
+                }
+                else
+                {
+                    SERIAL_SEND(UART5, length, str);
+                }
+                #endif
+            }
+            SerialNo5.sentFlag = FALSE;
             #endif
             break;
         case Serial6:
             #if SERIAL_COM6_ENABLE
-            SERIAL_SEND(USART6, length, str);
+            if (needCriticalZone)
+            {
+                SERIAL_SEND(USART6, length, str);
+            }
+            else
+            {
+                #if SERIAL_COM6_DMA_ENABLE
+                #if SYS_RT_THREAD_ENABLE
+                // RT Thread 由于引导启动方式不一样，第一次打印的时候系统还没正常初始化完毕，中断等不会被调用，所以需要这一步骤
+                if (SystemInitialized)
+                {
+                #endif
+                    HAL_UART_Transmit_DMA(&SerialNo6.handle, (uint8_t *)str, length);
+                    // 传输完成回调依靠中断，所以串口处不能使用临界区, 如果不使用下面的等待，传输过快就会导致数据紊乱
+                #else
+                    // 中断传输方式也需要中断开启
+                    // HAL_UART_Transmit_IT(&SerialNo6.handle, (uint8_t *)str, length);
+                #endif
+                    // 等待传输完成
+                    while (!SerialNo6.sentFlag);
+                #if SYS_RT_THREAD_ENABLE
+                }
+                else
+                {
+                    SERIAL_SEND(USART6, length, str);
+                }
+                #endif
+            }
+            SerialNo6.sentFlag = FALSE;
             #endif
             break;
         default:
             break;
     }
-    
     // 不指定长度，并且是有格式化的(不是纯打印的)
     if (isSpecifyLength == FALSE && isOnlyPrint == FALSE)
     {
@@ -195,70 +361,20 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
     SRAMHelper.Free(SRAM_INTERNAL, buffer);
     buffer = NULL;
     #else
-    
     #endif
     str = NULL;
     serialLock = NULL;
-    #if SYS_FREERTOS_ENABLE
-    taskEXIT_CRITICAL();
-    #elif SYS_RT_THREAD_ENABLE
-    /* 退出临界段 */
-    rt_exit_critical();
-    #endif
-}
-
-void SerialSendDataDMA(SerialType serialType, uint8_t* data, uint32_t size)
-{
-    switch (serialType)
+    if (needCriticalZone)
     {
-        case Serial1:
-            #if SERIAL_COM1_ENABLE
-                #if SERIAL_COM1_DMA_ENABLE
-                HAL_UART_Transmit_DMA(&SerialNo1.handle, (uint8_t *)data, size);
-                // 等待TX的DMA的传输完成。F407IGT6 中USART1的DMA是Stream7，所以使用 DMA_FLAG_TCIF3_7
-                // while (__HAL_DMA_GET_FLAG(&SerialNo1.DMA_Tx_Handle, DMA_FLAG_TCIF3_7) == RESET);
-                #endif
-            #endif
-            break;
-        case Serial2:
-            #if SERIAL_COM2_ENABLE
-                #if SERIAL_COM2_DMA_ENABLE
-                HAL_UART_Transmit_DMA(&SerialNo2.handle, (uint8_t *)data, size);
-                #endif
-            #endif
-            break;
-        case Serial3:
-            #if SERIAL_COM3_ENABLE
-                #if SERIAL_COM3_DMA_ENABLE
-                HAL_UART_Transmit_DMA(&SerialNo3.handle, (uint8_t *)data, size);
-                #endif
-            #endif
-            break;
-        case Serial4:
-            #if SERIAL_COM4_ENABLE
-                #if SERIAL_COM4_DMA_ENABLE
-                HAL_UART_Transmit_DMA(&SerialNo4.handle, (uint8_t *)data, size);
-                #endif
-            #endif
-            break;
-        case Serial5:
-            #if SERIAL_COM5_ENABLE
-                #if SERIAL_COM5_DMA_ENABLE
-                HAL_UART_Transmit_DMA(&SerialNo5.handle, (uint8_t *)data, size);
-                #endif
-            #endif
-            break;
-        case Serial6:
-            #if SERIAL_COM6_ENABLE
-                #if SERIAL_COM6_DMA_ENABLE
-                HAL_UART_Transmit_DMA(&SerialNo6.handle, (uint8_t *)data, size);
-                #endif
-            #endif
-            break;
-        default:
-            break;
+        #if SYS_FREERTOS_ENABLE
+        taskEXIT_CRITICAL();
+        #elif SYS_RT_THREAD_ENABLE
+        /* 退出临界段 */
+        rt_exit_critical();
+        #endif
     }
 }
+
 
 void SerialDataGet(SerialType serialType, char* refData, uint16_t *refLength,
                     Bool isGetLength, Bool isGetString, Bool isPrintUse)

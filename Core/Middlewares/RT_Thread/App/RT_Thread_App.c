@@ -15,8 +15,8 @@ rt_thread_t AnoCommandPhraseThread = RT_NULL;
 
 // 事件
 rt_event_t timerTimeoutEvent = RT_NULL;
-// 消息队列
-rt_mq_t data_mq = RT_NULL;
+// 消息队列，配合命令数据使用
+rt_mq_t commandData_mq = RT_NULL;
 
 void LED1_ThreadEntry(void *parameter)
 {
@@ -47,7 +47,7 @@ void AnoCommandPhraseThreadEntry(void *parameter)
     while (TRUE)
     {
         /* 队列读取（接收），等待时间为一直等待 */
-        uwRet = rt_mq_recv(data_mq,                 /* 读取（接收）队列的ID(句柄) */
+        uwRet = rt_mq_recv(commandData_mq,          /* 读取（接收）队列的ID(句柄) */
                             outData,                /* 读取（接收）的数据保存位置 */
                             sizeof(outData),        /* 读取（接收）的数据的长度 */
                             RT_WAITING_FOREVER);    /* 等待时间：一直等 */
@@ -104,12 +104,12 @@ void App_Run(void)
                             RT_IPC_FLAG_PRIO);          /* 事件模式 FIFO(0x00)*/
     SYSTEM_ASSERT_EXPRESS(timerTimeoutEvent == RT_NULL, result);
     /* 创建消息队列 */
-    data_mq = rt_mq_create("data_mq",           /* 消息队列名字 */
+    commandData_mq = rt_mq_create("data_mq",    /* 消息队列名字 */
                             10,                 /* 消息的最大长度 */
                             50,                 /* 消息队列的最大容量 */
                             RT_IPC_FLAG_FIFO);  /* 队列模式 FIFO(0x00)*/
     
-    SYSTEM_ASSERT_EXPRESS(data_mq == RT_NULL, result);
+    SYSTEM_ASSERT_EXPRESS(commandData_mq == RT_NULL, result);
     
     AppThreadStart = RTOSThreadCreate("AppThreadStart",
                                    AppThreadStartEntry,

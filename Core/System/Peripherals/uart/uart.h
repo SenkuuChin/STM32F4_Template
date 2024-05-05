@@ -9,7 +9,8 @@
     typedef struct
     {
         uint8_t Instance;                   /* 实例化 */
-        uint8_t receiveFinishFlag;          /* 接收数据完成标识位 */
+        __IO uint8_t receiveFinishFlag;     /* 接收数据完成标识位 */
+        __IO uint8_t sentFlag;              /* 发送完成标识位 */
         uint8_t tempData;                   /* 缓存数据，每次接收一个字节 */
         uint16_t length;                    /* 接收到的数据长度 */
         UART_HandleTypeDef handle;
