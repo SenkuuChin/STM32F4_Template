@@ -7,9 +7,10 @@
     #define SYS_STRING_HELPER_ENABLE            0
     #define SYS_CAN_ENABLE                      0
     #define SYS_SERIAL_ENABLE                   1
-    // RTOS 
+    // RTOS 启用选择
     #define SYS_FREERTOS_ENABLE                 0
     #define SYS_RT_THREAD_ENABLE                0
+    #define SYS_UCOS_ENABLE                     0
     // 是否显示Debug的信息
     #define SYS_SHOW_DEBUG_INFO_ENABLE          1
     #if SYS_SHOW_DEBUG_INFO_ENABLE & !SYS_SERIAL_ENABLE
@@ -23,6 +24,7 @@
     #define SYS_CAN_ENABEL                      1
     #define SYS_TIMER_ENABLE                    1
     #define SYS_I2C_ENABLE                      0
+    #define SYS_SPI_ENABLE                      0
     #define SYS_I2C_USE_HARDWARE                1
     #define SYS_SD_ENABLE                       0
     #define SYS_ETHERNET_ENABLE                 0
@@ -55,6 +57,9 @@
     // I2C
     #define I2C1_ENABLE                         0
     #define I2C2_ENABLE                         0
+    // SPI
+    #define SPI1_ENABLE                         0
+    #define SPI2_ENBALE                         0
     // Timer
     #define TIMER1_ENABLE                       0
     #define TIMER2_ENABLE                       0

@@ -74,11 +74,11 @@
     #define TIMER4_AUTORELOADPRELOAD        TIM_AUTORELOAD_PRELOAD_DISABLE
 
     /* 基础定时器6 */
-    #define TIMER6_PRESCALER                83
+    #define TIMER6_PRESCALER                8399
     // 计数模式
     #define TIMER6_COUNTER_MODE             TIM_COUNTERMODE_UP
     // 周期（TIM1为16位）
-    #define TIMER6_ARR                      999
+    #define TIMER6_ARR                      9
     #define TIMER6_AUTORELOADPRELOAD        TIM_AUTORELOAD_PRELOAD_DISABLE
 
     /* 基础定时器7 */

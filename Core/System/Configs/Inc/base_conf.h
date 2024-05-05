@@ -34,6 +34,42 @@
         FALSE = 0,
         TRUE
     } Bool;
+    
+    #define RESET_ARRAY(arr, len)               do { \
+    uint32_t _i_; \
+    for (_i_ = 0; _i_ < len; ++_i_) \
+    { \
+        arr[_i_] = 0; \
+    } \
+    } while (0)
+    #define SET_ARRAY(arr, len, val)            do { \
+        uint32_t _i_; \
+        for (_i_ = 0; _i_ < len; ++_i_) \
+        { \
+            arr[_i_] = val; \
+        } \
+    } while (0)
+    #define COPY_DATA(orgArr, desArr, start, end)     do { \
+        uint32_t _i_; \
+        for (_i_ = start; _i_ < end; ++_i_) \
+        { \
+            desArr[_i_] = orgArr[_i_]; \
+        } \
+    } while (0)
+    
+    #define APPEND_DATA(orgArr, desArr, start, end)     do { \
+        uint32_t _i_, _j_; \
+        for (_i_ = start, _j_ = 0; _i_ < end; ++_i_, ++_j_) \
+        { \
+            desArr[_i_] = orgArr[_j_]; \
+        } \
+    } while (0)
+    
+    #define LIMIT(x, max, min)                  ((x < max ) ? ((x > min ) ? x : min) : max)
+    #define MAX(a, b, c)                        (a > b ? a : b > c ? b : c)
+    #define MIN(a, b, c)                        (a < b ? a : b < c ? b : c)
+    
+    
     #ifdef __cplusplus
     }
     #endif
