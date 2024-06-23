@@ -1,4 +1,4 @@
-#include "Peripherals/timer/timer.h"
+#include "Peripherals/tim/tim.h"
 #include "timer_conf.h"
 #include "global_conf.h"
 
@@ -14,7 +14,7 @@ TIM_HandleTypeDef g_GeneralTimer3Handle;
 #if GENERAL_TIMER3_ENCODER_ENABLE
 TIM_Encoder_InitTypeDef g_GeneralTimer3_Encoder_Handle;
 #endif
-void GeneralTimer3_Init(void)
+__weak void GeneralTimer3_Init(void)
 {
     g_GeneralTimer3Handle.Instance = TIM3;
     g_GeneralTimer3Handle.Init.Prescaler = 0;
@@ -63,7 +63,7 @@ void GeneralTimer3_Init(void)
 
 #if TIMER6_ENABLE
 TIM_HandleTypeDef g_BasicTimer6Handle = { 0 };
-void BasicTimer6_Init(void)
+__weak void BasicTimer6_Init(void)
 {
     // 本次工程中TIM6定时 1ms一个周期
     g_BasicTimer6Handle.Instance = TIM6;
@@ -80,7 +80,7 @@ void BasicTimer6_Init(void)
 
 #if TIMER7_ENABLE
 TIM_HandleTypeDef g_BasicTimer7Handle;
-void BasicTimer7_Init(void)
+__weak void BasicTimer7_Init(void)
 {
     // 本次工程中TIM7定时 1000ms一个周期
     g_BasicTimer7Handle.Instance = TIM7;                        /* 定时器7 */
@@ -97,7 +97,7 @@ TIM_HandleTypeDef g_AdvancedTimer8Handle = { 0 };
 #if TIMER8_OC_MODE_ENABLE
 TIM_OC_InitTypeDef g_AdvancedTimer8OCHandle = { 0 };
 #endif
-void AdvanceTimer8_Init(void)
+__weak void AdvanceTimer8_Init(void)
 {
     g_AdvancedTimer8Handle.Instance = TIM8;                                     /* 定时器8 */
     g_AdvancedTimer8Handle.Init.Prescaler = TIMER8_PRESCALER;                   /* 定时器分频 */

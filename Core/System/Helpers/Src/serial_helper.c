@@ -157,7 +157,7 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
                 }
                 else
                 {
-                    #if SERIAL_COM1_DMA_ENABLE
+                    #if SERIAL_COM1_DMA_ENABLE && SERIAL_COM1_TX_DMA_ENABLE
                     #if SYS_RT_THREAD_ENABLE
                     // RT Thread 由于引导启动方式不一样，第一次打印的时候系统还没正常初始化完毕，中断等不会被调用，所以需要这一步骤
                     if (SystemInitialized)
@@ -168,7 +168,7 @@ void SerialOutput(SerialType serialType, uint8_t isNeedDash,
                         // 传输完成回调依靠中断，所以串口处不能使用临界区, 如果不使用下面的等待，传输过快就会导致数据紊乱
                         #else
                         // 中断传输方式也需要中断开启
-                        // HAL_UART_Transmit_IT(&SerialNo1.handle, (uint8_t *)str, length);
+                        HAL_UART_Transmit_IT(&SerialNo1.handle, (uint8_t *)str, length);
                         #endif
                         // 等待传输完成
                         while (!SerialNo1.sentFlag);

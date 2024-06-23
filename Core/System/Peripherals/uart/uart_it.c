@@ -171,7 +171,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     {
         #if SERIAL_COM1_ENABLE
             #if SERIAL_COM1_DMA_ENABLE
-            
+                SerialSendData(DEBUG_INFO_OUT_DEFAULT_SERIAL, SerialNo1.data, Size);
                 // HAL_UART_Transmit_DMA(huart, (uint8_t *)SerialNo1.data, Size);
                 #if SYS_RT_THREAD_ENABLE
                 HandleResult result = OK;
@@ -320,6 +320,7 @@ void USART1_IRQHandler(void)
     }
     #else
     HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo1.handle, (uint8_t *)SerialNo1.data, SERIAL_DATA_LENGTH);
+    __HAL_DMA_DISABLE_IT(&SerialNo1.DMA_Rx_Handle, DMA_IT_HT);
     #endif
 }
 #endif
@@ -355,6 +356,7 @@ void USART2_IRQHandler(void)
     }
     #else
     HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo2.handle, (uint8_t *)SerialNo2.data, SERIAL_DATA_LENGTH);
+    __HAL_DMA_DISABLE_IT(&SerialNo2.DMA_Rx_Handle, DMA_IT_HT);
     #endif
 }
 #endif
@@ -390,6 +392,7 @@ void USART3_IRQHandler(void)
     }
     #else
     HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo3.handle, (uint8_t *)SerialNo3.data, SERIAL_DATA_LENGTH);
+    __HAL_DMA_DISABLE_IT(&SerialNo3.DMA_Rx_Handle, DMA_IT_HT);
     #endif
 }
 #endif
@@ -425,6 +428,7 @@ void UART4_IRQHandler(void)
     }
     #else
     HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo4.handle, (uint8_t *)SerialNo4.data, SERIAL_DATA_LENGTH);
+    __HAL_DMA_DISABLE_IT(&SerialNo4.DMA_Rx_Handle, DMA_IT_HT);
     #endif
 }
 #endif
@@ -460,6 +464,7 @@ void UART5_IRQHandler(void)
     }
     #else
     HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo5.handle, (uint8_t *)SerialNo5.data, SERIAL_DATA_LENGTH);
+    __HAL_DMA_DISABLE_IT(&SerialNo5.DMA_Rx_Handle, DMA_IT_HT);
     #endif
 }
 #endif
@@ -495,6 +500,7 @@ void USART6_IRQHandler(void)
     }
     #else
     HAL_UARTEx_ReceiveToIdle_DMA(&SerialNo6.handle, (uint8_t *)SerialNo6.data, SERIAL_DATA_LENGTH);
+    __HAL_DMA_DISABLE_IT(&SerialNo6.DMA_Rx_Handle, DMA_IT_HT);
     #endif
 }
 #endif

@@ -4,7 +4,7 @@
 #include "Peripherals/can/can.h"
 #endif
 #if SYS_TIMER_ENABLE
-#include "Peripherals/timer/timer.h"
+#include "Peripherals/tim/tim.h"
 #endif
 
 void PeripheralInitialize(void)
