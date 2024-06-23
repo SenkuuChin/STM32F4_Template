@@ -3,7 +3,13 @@
 #include "RT_ThreadHelper.h"
 #include "BSP/led/led.h"
 #include "AnoUpperHelper.h"
+#include "YHPIDUpperHelper.h"
 
+#define USE_YH_UPPER            1
+#define USE_ATK_UPPER           2
+#define USE_ANO_UPPER           3
+
+#define SELECT_UPPER            USE_YH_UPPER
 
 /* 定义线程控制块 */
 ALIGN(RT_ALIGN_SIZE)
@@ -12,6 +18,11 @@ ALIGN(RT_ALIGN_SIZE)
 rt_thread_t LED1_Thread = RT_NULL;
 ALIGN(RT_ALIGN_SIZE)
 rt_thread_t AnoCommandPhraseThread = RT_NULL;
+// 野火PID上位机线程
+ALIGN(RT_ALIGN_SIZE)
+rt_thread_t YHCommandThread = RT_NULL;
+// 野火上位机解析
+YH_PIDUpperReceivedInfo_TypeDef YH_UpperInfo = { 0 };
 
 // 事件
 rt_event_t timerTimeoutEvent = RT_NULL;
@@ -33,7 +44,7 @@ void LED1_ThreadEntry(void *parameter)
         if (recved == TIMER6_TIMEOUT)
         {
             LED0_TOGGLE();
-            AnoAssistantLogPrintf(LOG_COLOR_GREEN, (uint8_t *)"Data is %d", recved);
+            // AnoAssistantLogPrintf(LOG_COLOR_GREEN, (uint8_t *)"Data is %d", recved);
             // AnoAssistantLog(LOG_COLOR_RED, (uint8_t *)"Log ok!");
         }
     }
@@ -57,6 +68,7 @@ void AnoCommandPhraseThreadEntry(void *parameter)
             rt_kprintf("数据接收出错,错误代码: 0x%lx\n",uwRet);
             continue;
         }
+        #if SELECT_UPPER == USE_ANO_UPPER
         if (!AnoCheckData(outData))
         {
             SerialPrint(DEBUG_INFO_OUT_DEFAULT_SERIAL, "数据校验错误！");
@@ -73,26 +85,51 @@ void AnoCommandPhraseThreadEntry(void *parameter)
             default:
                 break;
         }
+        #elif SELECT_UPPER == USE_ATK_UPPER
         
+        #elif SELECT_UPPER == USE_YH_UPPER
+        
+        YH_UpperCommandAnalysis(&YH_UpperInfo, outData, sizeof(outData));
+        #endif
     }
 }
 
+#if SELECT_UPPER == USE_YH_UPPER
+void YHCommandThreadEntry(void *parameter)
+{
+    while (TRUE)
+    {
+        
+    }
+}
+#endif
 
 void AppThreadStartEntry(void *arg)
 {
+    HandleResult result = OK;
     LED1_Thread = RTOSThreadCreate("LED1_Thread",
                                    LED1_ThreadEntry,
                                    RT_NULL,
                                    512,
                                    3,
                                    20);
-    
+    SYSTEM_ASSERT_EXPRESS(LED1_Thread == RT_NULL, result);
     AnoCommandPhraseThread = RTOSThreadCreate("AnoCommandPhraseThread",
                                    AnoCommandPhraseThreadEntry,
                                    RT_NULL,
                                    512,
                                    3,
                                    20);
+    SYSTEM_ASSERT_EXPRESS(AnoCommandPhraseThread == RT_NULL, result);
+    #if SELECT_UPPER == USE_ATK_UPPER
+    YHCommandThread = RTOSThreadCreate("YHCommandThread",
+                                   YHCommandThreadEntry,
+                                   RT_NULL,
+                                   512,
+                                   3,
+                                   20);
+    SYSTEM_ASSERT_EXPRESS(YHCommandThread == RT_NULL, result);
+    #endif
     RTOSThreadClose(AppThreadStart);
 }
 
@@ -105,7 +142,7 @@ void App_Run(void)
     SYSTEM_ASSERT_EXPRESS(timerTimeoutEvent == RT_NULL, result);
     /* 创建消息队列 */
     commandData_mq = rt_mq_create("data_mq",    /* 消息队列名字 */
-                            10,                 /* 消息的最大长度 */
+                            50,                 /* 消息的最大长度 */
                             50,                 /* 消息队列的最大容量 */
                             RT_IPC_FLAG_FIFO);  /* 队列模式 FIFO(0x00)*/
     
@@ -114,14 +151,12 @@ void App_Run(void)
     AppThreadStart = RTOSThreadCreate("AppThreadStart",
                                    AppThreadStartEntry,
                                    RT_NULL,
-                                   256,
+                                   512,
                                    2,
                                    20);
     
     
     SYSTEM_ASSERT_EXPRESS(AppThreadStart == RT_NULL, result);
-    
-    // rt_thread_startup(AppThreadStart);
 }
 
 App_TypeDef App = { App_Run };

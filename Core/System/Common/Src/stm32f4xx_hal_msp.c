@@ -54,17 +54,23 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         #if SERIAL_COM1_ENABLE
         __HAL_RCC_USART1_CLK_ENABLE();
         SERIAL_COM1_PIN_CLK_ENABLE();
-        
+        #if SERIAL_COM1_DMA_ENABLE
+            #if SERIAL_COM1_TX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+            #if SERIAL_COM1_RX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+        #endif
         GPIO_InitStructure.Pin = SERIAL_COM1_TX_PIN;
         GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStructure.Pull = GPIO_NOPULL;
+        GPIO_InitStructure.Pull = GPIO_PULLUP;
         GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
         GPIO_InitStructure.Alternate = SERIAL_COM1_AF;
         
         HAL_GPIO_Init(SERIAL_COM1_TX_PIN_PORT, &GPIO_InitStructure);
         
         GPIO_InitStructure.Pin = SERIAL_COM1_RX_PIN;
-        GPIO_InitStructure.Pull = GPIO_PULLUP;
         GPIO_InitStructure.Alternate = SERIAL_COM1_AF;
         HAL_GPIO_Init(SERIAL_COM1_RX_PIN_PORT, &GPIO_InitStructure);
     
@@ -72,6 +78,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_NVIC_SetPriority(USART1_IRQn, 
                             SYS_DEFAULT_COMMINICATE_M_PRIORITY,
                             SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+        #if SERIAL_COM1_DMA_ENABLE
+            #if SERIAL_COM1_TX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream7_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            #endif
+            #if SERIAL_COM1_RX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream2_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+            #endif
+        #endif
         #endif
     }
     #if SERIAL_COM2_ENABLE
@@ -80,6 +100,15 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         __HAL_RCC_USART2_CLK_ENABLE();
         SERIAL_COM2_PIN_CLK_ENABLE();
 
+        #if SERIAL_COM2_DMA_ENABLE
+            #if SERIAL_COM2_TX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+            #if SERIAL_COM2_RX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+        #endif
+    
         GPIO_InitStructure.Pin = SERIAL_COM2_TX_PIN;
         GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStructure.Pull = GPIO_PULLUP;
@@ -94,6 +123,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_NVIC_SetPriority(USART2_IRQn,
                             SYS_DEFAULT_COMMINICATE_M_PRIORITY,
                             SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+        #if SERIAL_COM2_DMA_ENABLE
+            #if SERIAL_COM2_TX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream7_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            #endif
+            #if SERIAL_COM2_RX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream2_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+            #endif
+        #endif
     }
     #endif
     #if SERIAL_COM3_ENABLE
@@ -102,6 +145,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         __HAL_RCC_USART3_CLK_ENABLE();
         SERIAL_COM3_PIN_CLK_ENABLE();
 
+        #if SERIAL_COM3_DMA_ENABLE
+            #if SERIAL_COM3_TX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+            #if SERIAL_COM3_RX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+        #endif
         GPIO_InitStructure.Pin = SERIAL_COM3_TX_PIN;
         GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStructure.Pull = GPIO_PULLUP;
@@ -116,6 +167,21 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_NVIC_SetPriority(USART3_IRQn,
                             SYS_DEFAULT_COMMINICATE_M_PRIORITY,
                             SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+                            
+        #if SERIAL_COM3_DMA_ENABLE
+            #if SERIAL_COM3_TX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream7_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            #endif
+            #if SERIAL_COM3_RX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream2_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+            #endif
+        #endif
     }
     #endif
     #if SERIAL_COM4_ENABLE
@@ -124,6 +190,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         __HAL_RCC_UART4_CLK_ENABLE();
         SERIAL_COM4_PIN_CLK_ENABLE();
 
+        #if SERIAL_COM4_DMA_ENABLE
+            #if SERIAL_COM4_TX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+            #if SERIAL_COM4_RX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+        #endif
         GPIO_InitStructure.Pin = SERIAL_COM4_TX_PIN;
         GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStructure.Pull = GPIO_PULLUP;
@@ -138,6 +212,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_NVIC_SetPriority(UART4_IRQn,
                             SYS_DEFAULT_COMMINICATE_M_PRIORITY,
                             SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+        #if SERIAL_COM4_DMA_ENABLE
+            #if SERIAL_COM4_TX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream7_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            #endif
+            #if SERIAL_COM4_RX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream2_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+            #endif
+        #endif
     }
     #endif
     #if SERIAL_COM5_ENABLE
@@ -146,6 +234,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         __HAL_RCC_UART5_CLK_ENABLE();
         SERIAL_COM5_PIN_CLK_ENABLE();
 
+        #if SERIAL_COM5_DMA_ENABLE
+            #if SERIAL_COM5_TX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+            #if SERIAL_COM5_RX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+        #endif
         GPIO_InitStructure.Pin = SERIAL_COM5_TX_PIN;
         GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStructure.Pull = GPIO_PULLUP;
@@ -160,6 +256,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_NVIC_SetPriority(UART5_IRQn,
                             SYS_DEFAULT_COMMINICATE_M_PRIORITY,
                             SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+        #if SERIAL_COM5_DMA_ENABLE
+            #if SERIAL_COM5_TX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream7_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            #endif
+            #if SERIAL_COM5_RX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream2_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+            #endif
+        #endif
     }
     #endif
     #if SERIAL_COM6_ENABLE
@@ -168,6 +278,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         __HAL_RCC_USART6_CLK_ENABLE();
         SERIAL_COM6_PIN_CLK_ENABLE();
 
+        #if SERIAL_COM6_DMA_ENABLE
+            #if SERIAL_COM6_TX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+            #if SERIAL_COM6_RX_DMA_ENABLE
+            __HAL_RCC_DMA2_CLK_ENABLE();
+            #endif
+        #endif
         GPIO_InitStructure.Pin = SERIAL_COM6_TX_PIN;
         GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStructure.Pull = GPIO_PULLUP;
@@ -182,6 +300,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_NVIC_SetPriority(USART6_IRQn,
                             SYS_DEFAULT_COMMINICATE_M_PRIORITY,
                             SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+        #if SERIAL_COM6_DMA_ENABLE
+            #if SERIAL_COM6_TX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream7_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            #endif
+            #if SERIAL_COM6_RX_DMA_ENABLE
+            HAL_NVIC_SetPriority(DMA2_Stream2_IRQn,
+                                SYS_DEFAULT_COMMINICATE_M_PRIORITY,
+                                SYS_DEFAULT_COMMINICATE_S_PRIORITY);
+            HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+            #endif
+        #endif
     }
     #endif
 }

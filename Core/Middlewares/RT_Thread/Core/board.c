@@ -53,7 +53,7 @@ static uint32_t _SysTick_Config(rt_uint32_t ticks)
 
 #if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
 /* 从内部 SRAM 里面分配一部分静态内存来作为 rtt 的堆空间，这里配置为 4KB */
-#define RT_HEAP_SIZE 1024
+#define RT_HEAP_SIZE 1024 * 4
 static uint32_t rt_heap[RT_HEAP_SIZE];     // heap default size: 4K(1024 * 4)
 RT_WEAK void *rt_heap_begin_get(void)
 {
