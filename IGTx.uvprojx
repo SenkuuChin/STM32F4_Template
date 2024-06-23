@@ -500,14 +500,14 @@
               <FilePath>.\Core\System\Peripherals\spi\spi_it.c</FilePath>
             </File>
             <File>
-              <FileName>timer.c</FileName>
+              <FileName>tim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Core\System\Peripherals\timer\timer.c</FilePath>
+              <FilePath>.\Core\System\Peripherals\tim\tim.c</FilePath>
             </File>
             <File>
-              <FileName>timer_it.c</FileName>
+              <FileName>tim_it.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Core\System\Peripherals\timer\timer_it.c</FilePath>
+              <FilePath>.\Core\System\Peripherals\tim\tim_it.c</FilePath>
             </File>
             <File>
               <FileName>uart.c</FileName>

@@ -9,7 +9,7 @@ CANManager_TypeDef g_CAN1_Manager = { 0 };
 #if !SYS_SRAM_MANAGE_ENABLE
 uint8_t CAN1_Data[8] = { 0 };
 #endif
-static HandleResult CAN1_Initialise(void)
+__weak HandleResult CAN1_Initialise(void)
 {
     HandleResult result = OK;
     g_CAN1_Manager.Handle.Instance = CAN1;
@@ -35,7 +35,8 @@ static HandleResult CAN1_Initialise(void)
     __HAL_CAN_ENABLE_IT(&g_CAN1_Manager.Handle, CAN_IT_RX_FIFO0_MSG_PENDING);
 
     CAN_FilterTypeDef sFilterConfig = { 0 };
-    /*配置CAN过滤器*/
+    /* 配置CAN过滤器 */
+    // CAN1 使用 0~13 的 BankID，CAN2使用 14 ~ 27 的BankID
     sFilterConfig.FilterBank = 0;
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
@@ -45,6 +46,7 @@ static HandleResult CAN1_Initialise(void)
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
     sFilterConfig.FilterActivation = CAN_FILTER_ENABLE;
+    // 指定CAN2的起始BankID是14
     sFilterConfig.SlaveStartFilterBank = 14;
 
     /* 过滤器配置 */
@@ -61,7 +63,8 @@ CANManager_TypeDef g_CAN2_Manager = { 0 };
 #if !SYS_SRAM_MANAGE_ENABLE
 uint8_t CAN2_Data[8] = { 0 };
 #endif
-static HandleResult CAN2_Initialise(void)
+
+__weak HandleResult CAN2_Initialise(void)
 {
     HandleResult result = OK;
     g_CAN2_Manager.Handle.Instance = CAN2;
@@ -87,8 +90,9 @@ static HandleResult CAN2_Initialise(void)
     __HAL_CAN_ENABLE_IT(&g_CAN2_Manager.Handle, CAN_IT_RX_FIFO0_MSG_PENDING);
 
     CAN_FilterTypeDef sFilterConfig = { 0 };
-    /*配置CAN过滤器*/
-    sFilterConfig.FilterBank = 0;
+    /* 配置CAN过滤器 */
+    // CAN1 使用 0~13 的 BankID，CAN2使用 14 ~ 27 的BankID
+    sFilterConfig.FilterBank = 14;
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
     sFilterConfig.FilterIdHigh = 0x0000;
@@ -97,6 +101,7 @@ static HandleResult CAN2_Initialise(void)
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
     sFilterConfig.FilterActivation = CAN_FILTER_ENABLE;
+    // 指定CAN2的起始BankID是14
     sFilterConfig.SlaveStartFilterBank = 14;
 
     /* 过滤器配置 */

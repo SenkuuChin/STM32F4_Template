@@ -3,7 +3,7 @@
     #ifdef __cplusplus
     extern "C" {
     #endif
-    void DMA_Init(void);
+        
     #ifdef __cplusplus
     }
     #endif

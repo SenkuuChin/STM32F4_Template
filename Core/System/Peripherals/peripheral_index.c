@@ -4,13 +4,11 @@
 #include "Peripherals/can/can.h"
 #endif
 #if SYS_TIMER_ENABLE
-#include "Peripherals/timer/timer.h"
+#include "Peripherals/tim/tim.h"
 #endif
-#include "Peripherals/dma/dma.h"
 
 void PeripheralInitialize(void)
 {
-    DMA_Init();
     #if SYS_SERIAL_ENABLE
         Serial_Init();
     #endif

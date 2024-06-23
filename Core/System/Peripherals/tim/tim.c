@@ -1,4 +1,4 @@
-#include "Peripherals/timer/timer.h"
+#include "Peripherals/tim/tim.h"
 #include "timer_conf.h"
 #include "global_conf.h"
 
@@ -40,7 +40,7 @@ void GeneralTimer3_ResetCounter(void)
     }
     __HAL_TIM_SET_COUNTER(&g_GeneralTimer3Handle, 0);
 }
-void GeneralTimer3_Init(void)
+__weak void GeneralTimer3_Init(void)
 {
     if (g_GeneralTimer3Handle.Instance == TIM3)
     {
@@ -119,7 +119,7 @@ void BasicTimer6_ResetCounter(void)
     }
     __HAL_TIM_SET_COUNTER(&g_BasicTimer6Handle, 0);
 }
-void BasicTimer6_Init(void)
+__weak void BasicTimer6_Init(void)
 {
     if (g_BasicTimer6Handle.Instance == TIM6)
     {
@@ -164,7 +164,7 @@ void BasicTimer7_ResetCounter(void)
     }
     __HAL_TIM_SET_COUNTER(&g_BasicTimer6Handle, 0);
 }
-void BasicTimer7_Init(void)
+__weak void BasicTimer7_Init(void)
 {
     if (g_BasicTimer7Handle.State == HAL_TIM_STATE_RESET)
     {
@@ -211,7 +211,7 @@ void AdvanceTimer8_ResetCounter(void)
     }
     __HAL_TIM_SET_COUNTER(&g_AdvancedTimer8Handle, 0);
 }
-void AdvanceTimer8_Init(void)
+__weak void AdvanceTimer8_Init(void)
 {
     if (g_AdvancedTimer8Handle.State == HAL_TIM_STATE_RESET)
     {

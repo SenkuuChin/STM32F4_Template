@@ -1,5 +1,5 @@
-#ifndef __MY_PERPHERALS_TIMER_H__
-    #define __MY_PERPHERALS_TIMER_H__
+#ifndef __MY_PERPHERALS_TIM_H__
+    #define __MY_PERPHERALS_TIM_H__
     #ifdef __cplusplus
     extern "C" {
     #endif

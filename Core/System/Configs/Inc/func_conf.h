@@ -51,6 +51,37 @@
     #define SERIAL_COM5_ENABLE                  0
     #define SERIAL_COM6_ENABLE                  0
 
+    #if SERIAL_COM1_ENABLE
+    #define SERIAL_COM1_DMA_ENABLE              1
+    #define SERIAL_COM1_TX_DMA_ENABLE           0
+    #define SERIAL_COM1_RX_DMA_ENABLE           1
+    #endif
+    #if SERIAL_COM2_ENABLE
+    #define SERIAL_COM2_DMA_ENABLE              1
+    #define SERIAL_COM2_TX_DMA_ENABLE           0
+    #define SERIAL_COM2_RX_DMA_ENABLE           1
+    #endif
+    #if SERIAL_COM3_ENABLE
+    #define SERIAL_COM3_DMA_ENABLE              1
+    #define SERIAL_COM3_TX_DMA_ENABLE           0
+    #define SERIAL_COM3_RX_DMA_ENABLE           1
+    #endif
+    #if SERIAL_COM4_ENABLE
+    #define SERIAL_COM4_DMA_ENABLE              1
+    #define SERIAL_COM4_TX_DMA_ENABLE           0
+    #define SERIAL_COM4_RX_DMA_ENABLE           1
+    #endif
+    #if SERIAL_COM5_ENABLE
+    #define SERIAL_COM5_DMA_ENABLE              1
+    #define SERIAL_COM5_TX_DMA_ENABLE           0
+    #define SERIAL_COM5_RX_DMA_ENABLE           1
+    #endif
+    #if SERIAL_COM6_ENABLE
+    #define SERIAL_COM6_DMA_ENABLE              1
+    #define SERIAL_COM6_TX_DMA_ENABLE           0
+    #define SERIAL_COM6_RX_DMA_ENABLE           1
+    #endif
+    
     // CAN
     #define CAN1_ENABLE                         1
     #define CAN2_ENABLE                         0
